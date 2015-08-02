@@ -68,7 +68,7 @@ object RemoteCityWasp {
     def currentCar = {
       val CarReserved = "(?s).*currentTime = ([0-9]+);.*car/unlock/([0-9]+).*".r
       val CarUnlocked = "(?s).*car/lock/([0-9]+).*".r
-      val NoCar = "(?s).*Duomenų nėra.*".r
+      val NoCar = """(?s).*msg">Duomen.*""".r
       Http(request / "lt" / "reservation" / "active" addCookie(sessionCookie) OK as.String).flatMap {
         case CarReserved(msLeft, carId) => Future.successful(Some(RemoteLockedCar(config, sessionCookie, carId)))
         case CarUnlocked(carId) => Future.successful(Some(RemoteUnlockedCar(config, sessionCookie, carId)))
