@@ -39,7 +39,7 @@ object RemoteCityWasp {
 
   private case class RemoteSession(config: Config, sessionCookie: Cookie) extends Session with Common {
     def loginChallenge = {
-      val Challenge = """(?s).*token]" value="([A-Za-z0-9]+)".*""".r
+      val Challenge = """(?s).*token]" value="([A-Za-z0-9_\-]+)".*""".r
       Http(request("/lt/auth/") addCookie(sessionCookie) OK as.String).flatMap {
         case Challenge(token) => Future.successful(RemoteLoginChallenge(config, sessionCookie, token))
         case s => Future.failed(new Error(s"Did not get login challenge token in $s."))
