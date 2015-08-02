@@ -10,3 +10,6 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka"       %% "akka-http-experimental"     % "1.0"     % "test",
   "com.typesafe.akka"       %% "akka-http-xml-experimental" % "1.0"     % "test"
 )
+
+enablePlugins(GitVersioning)
+git.useGitDescribe := true

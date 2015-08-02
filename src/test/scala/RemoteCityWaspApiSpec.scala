@@ -39,74 +39,82 @@ class RemoteCityWaspApiSpec extends WordSpec with Matchers with ScalaFutures {
     """)
 
     val route =
-      path("/lt/auth/") {
-        get {
-          optionalCookie(config.getString("citywasp.session-cookie")) {
-            case Some(cookie) => {
-              implicit val mar = ScalaXmlSupport.nodeSeqMarshaller(MediaTypes.`text/html`)
-              complete {
-                <html>
-								  <body>
- 									  <form name="login">
-            				  <input name="login[_token]" value="c62ETPyxEh3t2QkZsxjPGaD9cEfgqG668OEjYDDQinw" />
-        					  </form>
-								  </body>
-							  </html>
+      pathPrefix("lt") {
+        pathPrefix("auth") {
+          pathSingleSlash {
+            get {
+              optionalCookie(config.getString("citywasp.session-cookie")) {
+                case Some(cookie) => {
+                  implicit val mar = ScalaXmlSupport.nodeSeqMarshaller(MediaTypes.`text/html`)
+                  complete {
+                    <html>
+                      <body>
+                        <form name="login">
+                          <input name="login[_token]" value="c62ETPyxEh3t2QkZsxjPGaD9cEfgqG668OEjYDDQinw" />
+                        </form>
+                      </body>
+                    </html>
+                  }
+                }
+                case None => setCookie(HttpCookie(config.getString("citywasp.session-cookie"), value = "test_session_id"))(complete("Session created."))
               }
             }
-            case None => setCookie(HttpCookie(config.getString("citywasp.session-cookie"), value = "test_session_id"))(complete("Session created."))
+          } ~
+          pathPrefix("login") {
+            pathSingleSlash {
+              post {
+                formFields("login[_token]", "login[email]", "login[password]") { (token, email, password) =>
+                  val location = if (allowLogin) "/lt/?showInfo=1" else "/lt/auth/"
+                  redirect(location, StatusCodes.Found)
+                }
+              }
+            }
           }
-        }
-      } ~
-      path("/lt/auth/login/") {
-        post {
-          formFields("login[_token]", "login[email]", "login[password]") { (token, email, password) =>
-            val location = if (allowLogin) "/lt/?showInfo=1" else "/lt/auth/"
-            redirect(location, StatusCodes.Found)
-          }
-        }
-      } ~
-      path("/lt/reservation/active") {
-        implicit val mar = ScalaXmlSupport.nodeSeqMarshaller(MediaTypes.`text/html`)
-        carStatus match {
-          case Reserved => complete {
-            <html>
-							<body>
-              	<script type="text/javascript">
-                	var currentTime = 833000;
-              	</script>
-              	<div>
-                	<a href="/lt/car/unlock/177" />
-              	</div>
-            	</body>
-						</html>
-          }
-          case Unlocked => complete {
-            <html>
-						  <body>
+        } ~
+        path("reservation" / "active") {
+          implicit val mar = ScalaXmlSupport.nodeSeqMarshaller(MediaTypes.`text/html`)
+          carStatus match {
+            case Reserved => complete {
+              <html>
+              <body>
+                <script type="text/javascript">
+                  var currentTime = 833000;
+                </script>
+                <div>
+                  <a href="/lt/car/unlock/177" />
+                </div>
+              </body>
+            </html>
+            }
+            case Unlocked => complete {
+              <html>
+              <body>
                 <div>
                   <a href="/lt/car/lock/177" />
                 </div>
-							</body>
-						</html>
+              </body>
+            </html>
+            }
+            case NoCar => complete {
+              <html>
+              <body>
+                <div class="error-msg">Duomenų nėra</div>
+              </body>
+            </html>
+            }
+            case Error => complete {
+              <html></html>
+            }
           }
-          case NoCar => complete {
-            <html>
-							<body>
-								<div class="error-msg">Duomenų nėra</div>
-							</body>
-						</html>
-          }
-          case Error => complete {
-            <html></html>
+        } ~
+        pathPrefix("car") {
+          path("unlock" / IntNumber) { carId =>
+            if (allowUnlock) redirect("/lt/reservation/active", StatusCodes.Found) else complete("Ohi")
+          } ~
+          path("lock" / IntNumber) { carId =>
+            if (allowLock) redirect("/lt/", StatusCodes.Found) else complete("Ohi")
           }
         }
-      } ~
-      path("lt" / "car" / "unlock" / IntNumber) { carId =>
-        if (allowUnlock) redirect("/lt/reservation/active", StatusCodes.Found) else complete("Ohi")
-      } ~
-      path("lt" / "car" / "lock" / IntNumber) { carId =>
-        if (allowLock) redirect("/lt/", StatusCodes.Found) else complete("Ohi")
       }
 
     val binding = Await.result(Http().bindAndHandle(route, "localhost", 0), 1.second)
