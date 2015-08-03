@@ -35,6 +35,13 @@ class RemoteCityWaspApiSpec extends WordSpec with Matchers with ScalaFutures {
         user-agent = "test_agent"
         email = "test@email.com"
         password = "test_password"
+        http {
+          user-agent = "test_agent"
+          connection-pooling = true
+          compression = true
+          connection-timeout = 10 seconds
+          request-timeout = 10 seconds
+        }
       }
     """)
 
