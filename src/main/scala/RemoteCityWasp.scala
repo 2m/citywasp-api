@@ -81,10 +81,10 @@ object RemoteCityWasp {
       extends LoggedIn
       with Common {
     def currentCar = {
-      val CarReserved = "(?s).*currentTime = ([0-9]+);.*car/unlock/([0-9]+).*".r
-      val CarUnlocked = "(?s).*car/lock/([0-9]+).*".r
-      val NoCar       = """(?s).*msg">Duomen.*""".r
-      waspHttp(request / "lt" / "reservation" / "active" addCookie (sessionCookie) OK as.String).flatMap {
+      val CarReserved = "(?s).*currentTime = ([0-9]+);.*reservation/start/([0-9]+).*".r
+      val CarUnlocked = "(?s).*reservation/stop/([0-9]+).*".r
+      val NoCar       = """(?s).*msg">[\s]*Duomen.*""".r
+      waspHttp(request / "mobile" / "lt" / "reservation" / "active" addCookie (sessionCookie) OK as.String).flatMap {
         case CarReserved(msLeft, carId) =>
           Future.successful(Some(RemoteLockedCar(waspHttp, config, sessionCookie, carId)))
         case CarUnlocked(carId) => Future.successful(Some(RemoteUnlockedCar(waspHttp, config, sessionCookie, carId)))
@@ -98,17 +98,19 @@ object RemoteCityWasp {
       extends LockedCar
       with Common {
     def unlock =
-      waspHttp(request / "lt" / "car" / "unlock" / carId addCookie (sessionCookie)).map(_.header("Location")).flatMap {
-        case Some("/lt/reservation/active") => Future.successful(())
-        case _                              => Future.failed(new Error(s"Error while unlocking current car."))
-      }
+      waspHttp(request / "mobile" / "lt" / "reservation" / "start" / carId addCookie (sessionCookie))
+        .map(_.header("Location"))
+        .flatMap {
+          case Some("/mobile/lt/reservation/active") => Future.successful(())
+          case _                                     => Future.failed(new Error(s"Error while unlocking current car."))
+        }
   }
 
   private case class RemoteUnlockedCar(waspHttp: Http, config: Config, sessionCookie: Cookie, carId: String)
       extends UnlockedCar
       with Common {
     def lock =
-      waspHttp(request / "lt" / "car" / "lock" / carId addCookie (sessionCookie))
+      waspHttp(request / "mobile" / "lt" / "reservation" / "stop" / carId addCookie (sessionCookie))
         .map(_.header("Location").headOption)
         .flatMap {
           case Some("/lt/") => Future.successful(())

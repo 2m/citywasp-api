@@ -82,53 +82,57 @@ class RemoteCityWaspApiSpec extends WordSpec with Matchers with ScalaFutures {
               }
             }
           }
-        } ~
-        path("reservation" / "active") {
-          implicit val mar = ScalaXmlSupport.nodeSeqMarshaller(MediaTypes.`text/html`)
-          carStatus match {
-            case Reserved =>
-              complete {
-                <html>
-              <body>
-                <script type="text/javascript">
-                  var currentTime = 833000;
-                </script>
-                <div>
-                  <a href="/lt/car/unlock/177" />
-                </div>
-              </body>
-            </html>
+        }
+      } ~
+      pathPrefix("mobile") {
+        pathPrefix("lt") {
+          pathPrefix("reservation") {
+            path("active") {
+              implicit val mar = ScalaXmlSupport.nodeSeqMarshaller(MediaTypes.`text/html`)
+              carStatus match {
+                case Reserved =>
+                  complete {
+                    <html>
+                      <body>
+                        <script type="text/javascript">
+                          var currentTime = 833000;
+                        </script>
+                        <div>
+                          <a href="/mobile/lt/reservation/start/177"/>
+                        </div>
+                      </body>
+                    </html>
+                  }
+                case Unlocked =>
+                  complete {
+                    <html>
+                      <body>
+                        <div>
+                          <a href="/mobile/lt/reservation/stop/177"/>
+                        </div>
+                      </body>
+                    </html>
+                  }
+                case NoCar =>
+                  complete {
+                    <html>
+                      <body>
+                        <div class="error-msg">Duomenų nėra</div>
+                      </body>
+                    </html>
+                  }
+                case Error =>
+                  complete {
+                    <html></html>
+                  }
               }
-            case Unlocked =>
-              complete {
-                <html>
-              <body>
-                <div>
-                  <a href="/lt/car/lock/177" />
-                </div>
-              </body>
-            </html>
-              }
-            case NoCar =>
-              complete {
-                <html>
-              <body>
-                <div class="error-msg">Duomenų nėra</div>
-              </body>
-            </html>
-              }
-            case Error =>
-              complete {
-                <html></html>
-              }
-          }
-        } ~
-        pathPrefix("car") {
-          path("unlock" / IntNumber) { carId =>
-            if (allowUnlock) redirect("/lt/reservation/active", StatusCodes.Found) else complete("Ohi")
-          } ~
-          path("lock" / IntNumber) { carId =>
-            if (allowLock) redirect("/lt/", StatusCodes.Found) else complete("Ohi")
+            } ~
+            path("start" / IntNumber) { carId =>
+              if (allowUnlock) redirect("/mobile/lt/reservation/active", StatusCodes.Found) else complete("Ohi")
+            } ~
+            path("stop" / IntNumber) { carId =>
+              if (allowLock) redirect("/lt/", StatusCodes.Found) else complete("Ohi")
+            }
           }
         }
       }
