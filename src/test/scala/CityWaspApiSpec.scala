@@ -42,17 +42,17 @@ class CityWaspApiSpec extends WordSpec with ScalaFutures with Matchers {
       implicit val cw = LocalCityWasp()
 
       val greeting = for {
-        session <- CityWasp.session
+        session   <- CityWasp.session
         challenge <- session.loginChallenge
-        login <- challenge.login
+        login     <- challenge.login
         status <- login.currentCar.map {
-          case Some(c: LockedCar) => "car locked"
+          case Some(c: LockedCar)   => "car locked"
           case Some(c: UnlockedCar) => "car unlocked"
-          case None => "no car"
+          case None                 => "no car"
         }
       } yield status
 
-      whenReady(greeting)(_ should be ("car locked"))
+      whenReady(greeting)(_ should be("car locked"))
     }
   }
 

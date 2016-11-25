@@ -1,0 +1,8 @@
+style                      = defaultWithAlign
+danglingParentheses        = true
+docstrings                 = JavaDoc
+indentOperator             = spray
+maxColumn                  = 120
+rewrite.rules              = [RedundantBraces, RedundantParens, SortImports]
+spaces.inImportCurlyBraces = true
+unindentTopLevelOperators  = true

@@ -25,7 +25,10 @@ class RemoteCityWaspApiSpec extends WordSpec with Matchers with ScalaFutures {
   object NoCar    extends CarStatus
   object Error    extends CarStatus
 
-  def withServer(allowLogin: Boolean = true, carStatus: CarStatus = Reserved, allowLock: Boolean = true, allowUnlock: Boolean = true)(testCode: Config => Any) {
+  def withServer(allowLogin: Boolean = true,
+                 carStatus: CarStatus = Reserved,
+                 allowLock: Boolean = true,
+                 allowUnlock: Boolean = true)(testCode: Config => Any) {
     implicit val sys = ActorSystem(s"RemoteCityWaspApiSpec-${id.addAndGet(1)}")
     implicit val mat = ActorMaterializer()
 
@@ -63,7 +66,9 @@ class RemoteCityWaspApiSpec extends WordSpec with Matchers with ScalaFutures {
                     </html>
                   }
                 }
-                case None => setCookie(HttpCookie(config.getString("citywasp.session-cookie"), value = "test_session_id"))(complete("Session created."))
+                case None =>
+                  setCookie(HttpCookie(config.getString("citywasp.session-cookie"), value = "test_session_id"))(
+                    complete("Session created."))
               }
             }
           } ~
@@ -81,8 +86,9 @@ class RemoteCityWaspApiSpec extends WordSpec with Matchers with ScalaFutures {
         path("reservation" / "active") {
           implicit val mar = ScalaXmlSupport.nodeSeqMarshaller(MediaTypes.`text/html`)
           carStatus match {
-            case Reserved => complete {
-              <html>
+            case Reserved =>
+              complete {
+                <html>
               <body>
                 <script type="text/javascript">
                   var currentTime = 833000;
@@ -92,26 +98,29 @@ class RemoteCityWaspApiSpec extends WordSpec with Matchers with ScalaFutures {
                 </div>
               </body>
             </html>
-            }
-            case Unlocked => complete {
-              <html>
+              }
+            case Unlocked =>
+              complete {
+                <html>
               <body>
                 <div>
                   <a href="/lt/car/lock/177" />
                 </div>
               </body>
             </html>
-            }
-            case NoCar => complete {
-              <html>
+              }
+            case NoCar =>
+              complete {
+                <html>
               <body>
                 <div class="error-msg">Duomenų nėra</div>
               </body>
             </html>
-            }
-            case Error => complete {
-              <html></html>
-            }
+              }
+            case Error =>
+              complete {
+                <html></html>
+              }
           }
         } ~
         pathPrefix("car") {
@@ -127,12 +136,13 @@ class RemoteCityWaspApiSpec extends WordSpec with Matchers with ScalaFutures {
     val binding = Await.result(Http().bindAndHandle(route, "localhost", 0), 1.second)
 
     try {
-      testCode(ConfigFactory
-          .parseString(s"""citywasp.url = "http://${binding.localAddress.getHostString}:${binding.localAddress.getPort}"""")
+      testCode(
+        ConfigFactory
+          .parseString(
+            s"""citywasp.url = "http://${binding.localAddress.getHostString}:${binding.localAddress.getPort}"""")
           .withFallback(config)
           .getConfig("citywasp"))
-    }
-    finally {
+    } finally {
       Await.ready(binding.unbind(), 1.second)
       sys.shutdown()
       sys.awaitTermination()
@@ -150,7 +160,7 @@ class RemoteCityWaspApiSpec extends WordSpec with Matchers with ScalaFutures {
       import scala.concurrent.ExecutionContext.Implicits.global
       implicit val cw = RemoteCityWasp(config)
       val result = for {
-        session <- CityWasp.session
+        session   <- CityWasp.session
         challenge <- session.loginChallenge
       } yield challenge
       Await.result(result, 1.second) shouldBe a[LoginChallenge]
@@ -160,9 +170,9 @@ class RemoteCityWaspApiSpec extends WordSpec with Matchers with ScalaFutures {
       import scala.concurrent.ExecutionContext.Implicits.global
       implicit val cw = RemoteCityWasp(config)
       val result = for {
-        session <- CityWasp.session
+        session   <- CityWasp.session
         challenge <- session.loginChallenge
-        loggedIn <- challenge.login
+        loggedIn  <- challenge.login
       } yield loggedIn
       Await.result(result, 1.second) shouldBe a[LoggedIn]
     }
@@ -171,9 +181,9 @@ class RemoteCityWaspApiSpec extends WordSpec with Matchers with ScalaFutures {
       import scala.concurrent.ExecutionContext.Implicits.global
       implicit val cw = RemoteCityWasp(config)
       val result = for {
-        session <- CityWasp.session
+        session   <- CityWasp.session
         challenge <- session.loginChallenge
-        loggedIn <- challenge.login
+        loggedIn  <- challenge.login
       } yield loggedIn
       Await.result(result.failed, 1.second).getCause.getMessage shouldBe "Unable to log in. Check username/password."
     }
@@ -182,9 +192,9 @@ class RemoteCityWaspApiSpec extends WordSpec with Matchers with ScalaFutures {
       import scala.concurrent.ExecutionContext.Implicits.global
       implicit val cw = RemoteCityWasp(config)
       val result = for {
-        session <- CityWasp.session
+        session   <- CityWasp.session
         challenge <- session.loginChallenge
-        loggedIn <- challenge.login
+        loggedIn  <- challenge.login
         Some(car) <- loggedIn.currentCar
       } yield car
       Await.result(result, 1.second) shouldBe a[LockedCar]
@@ -194,9 +204,9 @@ class RemoteCityWaspApiSpec extends WordSpec with Matchers with ScalaFutures {
       import scala.concurrent.ExecutionContext.Implicits.global
       implicit val cw = RemoteCityWasp(config)
       val result = for {
-        session <- CityWasp.session
+        session   <- CityWasp.session
         challenge <- session.loginChallenge
-        loggedIn <- challenge.login
+        loggedIn  <- challenge.login
         Some(car) <- loggedIn.currentCar
       } yield car
       Await.result(result, 1.second) shouldBe a[UnlockedCar]
@@ -206,10 +216,10 @@ class RemoteCityWaspApiSpec extends WordSpec with Matchers with ScalaFutures {
       import scala.concurrent.ExecutionContext.Implicits.global
       implicit val cw = RemoteCityWasp(config)
       val result = for {
-        session <- CityWasp.session
+        session   <- CityWasp.session
         challenge <- session.loginChallenge
-        loggedIn <- challenge.login
-        car <- loggedIn.currentCar
+        loggedIn  <- challenge.login
+        car       <- loggedIn.currentCar
       } yield car
       Await.result(result, 1.second) shouldBe None
     }
@@ -218,10 +228,10 @@ class RemoteCityWaspApiSpec extends WordSpec with Matchers with ScalaFutures {
       import scala.concurrent.ExecutionContext.Implicits.global
       implicit val cw = RemoteCityWasp(config)
       val result = for {
-        session <- CityWasp.session
+        session   <- CityWasp.session
         challenge <- session.loginChallenge
-        loggedIn <- challenge.login
-        car <- loggedIn.currentCar
+        loggedIn  <- challenge.login
+        car       <- loggedIn.currentCar
       } yield car
       Await.result(result.failed, 1.second).getCause.getMessage shouldBe "Error while getting current car."
     }
@@ -230,11 +240,11 @@ class RemoteCityWaspApiSpec extends WordSpec with Matchers with ScalaFutures {
       import scala.concurrent.ExecutionContext.Implicits.global
       implicit val cw = RemoteCityWasp(config)
       val result = for {
-        session <- CityWasp.session
-        challenge <- session.loginChallenge
-        loggedIn <- challenge.login
+        session              <- CityWasp.session
+        challenge            <- session.loginChallenge
+        loggedIn             <- challenge.login
         Some(car: LockedCar) <- loggedIn.currentCar
-        res <- car.unlock
+        res                  <- car.unlock
       } yield res
       Await.result(result, 1.second) shouldBe ()
     }
@@ -243,11 +253,11 @@ class RemoteCityWaspApiSpec extends WordSpec with Matchers with ScalaFutures {
       import scala.concurrent.ExecutionContext.Implicits.global
       implicit val cw = RemoteCityWasp(config)
       val result = for {
-        session <- CityWasp.session
-        challenge <- session.loginChallenge
-        loggedIn <- challenge.login
+        session              <- CityWasp.session
+        challenge            <- session.loginChallenge
+        loggedIn             <- challenge.login
         Some(car: LockedCar) <- loggedIn.currentCar
-        res <- car.unlock
+        res                  <- car.unlock
       } yield res
       Await.result(result.failed, 1.second).getCause.getMessage shouldBe "Error while unlocking current car."
     }
@@ -256,11 +266,11 @@ class RemoteCityWaspApiSpec extends WordSpec with Matchers with ScalaFutures {
       import scala.concurrent.ExecutionContext.Implicits.global
       implicit val cw = RemoteCityWasp(config)
       val result = for {
-        session <- CityWasp.session
-        challenge <- session.loginChallenge
-        loggedIn <- challenge.login
+        session                <- CityWasp.session
+        challenge              <- session.loginChallenge
+        loggedIn               <- challenge.login
         Some(car: UnlockedCar) <- loggedIn.currentCar
-        res <- car.lock
+        res                    <- car.lock
       } yield res
       Await.result(result, 1.second) shouldBe ()
     }
@@ -269,11 +279,11 @@ class RemoteCityWaspApiSpec extends WordSpec with Matchers with ScalaFutures {
       import scala.concurrent.ExecutionContext.Implicits.global
       implicit val cw = RemoteCityWasp(config)
       val result = for {
-        session <- CityWasp.session
-        challenge <- session.loginChallenge
-        loggedIn <- challenge.login
+        session                <- CityWasp.session
+        challenge              <- session.loginChallenge
+        loggedIn               <- challenge.login
         Some(car: UnlockedCar) <- loggedIn.currentCar
-        res <- car.lock
+        res                    <- car.lock
       } yield res
       Await.result(result.failed, 1.second).getCause.getMessage shouldBe "Error while locking current car."
     }
