@@ -20,6 +20,7 @@ object CityWaspApiSpec {
 
   case class LocalLoggedIn() extends LoggedIn {
     def currentCar = Future.successful(Some(LocalLockedCar()))
+    def parkedCars = Future.successful(Seq.empty)
   }
 
   case class LocalLockedCar() extends LockedCar {

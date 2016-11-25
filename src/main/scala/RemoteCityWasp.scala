@@ -5,9 +5,12 @@ import com.ning.http.client.cookie.Cookie
 import com.ning.http.client.Response
 import dispatch._
 import dispatch.Defaults._
+
 import scala.concurrent.Future
 import scala.collection.JavaConversions._
 import java.util.concurrent.TimeUnit
+
+import scala.util.matching.Regex
 
 object RemoteCityWasp {
 
@@ -91,6 +94,15 @@ object RemoteCityWasp {
         case NoCar()            => Future.successful(None)
         case _                  => Future.failed(new Error(s"Error while getting current car."))
       }
+    }
+
+    def parkedCars = {
+      val CarListing =
+        """(?s)"id":([0-9]+),"licensePlate":"([A-Z0-9]+)","brand":"([A-Za-z0-9 ]+)","model":"([A-Za-z0-9 \\]+).*?"lat":([0-9\.]+),"lon":([0-9\.]+)""".r
+      waspHttp(request / "mobile" / "lt" / "" addCookie (sessionCookie) OK as.String).map(resp =>
+        CarListing.findAllMatchIn(resp).toSeq.map { m =>
+          ParkedCar(m.group(1).toInt, m.group(2), m.group(3), m.group(4), m.group(5).toDouble, m.group(6).toDouble)
+      })
     }
   }
 
