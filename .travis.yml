@@ -1,12 +1,16 @@
 language: scala
+
+scala: 2.12.2
+
 jdk: oraclejdk8
-script: sbt test
+
 deploy:
   provider: script
-  script: sbt publish
+  script: sbt ++$TRAVIS_SCALA_VERSION publish
   on:
     tags: true
     repo: 2m/citywasp-api
+
 env:
   global:
   - secure: "GvLYtt8vY6gQHCPyTEXYeu5HNBbnFqumC65SV7/Z5F4F0gksUY4e1HtqY7BI+MjrU3ofsz4qxWXn2CQCgXwqhgJFIfslSa2N2T7UuHEv+8vlpoVLvCArV6ZDdcTElSyN67uMtX+tov+kYg1z3fNkDBFpkM4lbLCOtl3QTBkrWsLXNfYZwAnIm8AAF/HvXdY5KYyfQXfK7bCiCHedarKWP6ovXxRz2l+vmm0uYNZjug5eXBfTyng5A3x4tRs3x4u9O3xgYXEZDa3cbkuu6jNIexb9fBoTXb3Px/Giqlnk3gKt63TQXAP7CgG4bHFmrmXapSYL62IBORNt6PV8FC8pzC3NzgtxUFFYnk3qHsyJFErMDmxqCtnUWJlX+vYqnht6+pXFKmDNBPd13Vm5AzStY6CQC2b7S9/pk4d8EF8PCtA56E+/mOR1ajl6jfjXPgNeECJRMdWH3hCJ3BKFgjB9/4Vqk1WDITqYKpmNQ09sVrivpfkaAfOL50OP2ntsXZ60+ivXi6SWI+FGBdtzVxMDCGm5f46lf+DSDkq7kBi0AxQajYpQVYTMIcyncLF8hln0a1uTyrGMsCwhMi/y4tWx9v/3IkgeOnwyuzpOzhQCo0RUD84jYW41p/CZ3Gqx/pPaAFotDbL5UpViVFL8zBlmg+6ppWAtxx6fpxQcREFKNVY=" # BINTRAY_USER
