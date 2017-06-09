@@ -17,7 +17,7 @@ object CityWaspApp extends App {
     login <- challenge.login
     _ = println(s"Login: $login")
     parkedCars <- login.parkedCars
-    _ = println(s"Parked cars: $parkedCars")
+    _ = println(s"Parked cars: ${parkedCars.toList}pen")
     status <- login.currentCar.map {
       case Some(c: LockedCar)   => "car locked"
       case Some(c: UnlockedCar) => "car unlocked"
