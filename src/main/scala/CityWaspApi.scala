@@ -25,7 +25,12 @@ trait LoggedIn {
 
 sealed trait Car
 
-case class ParkedCar(id: Int, licensePlate: String, brand: String, model: String, lat: Double, lon: Double)
+case class ParkedCar(id: Int,
+                     licensePlate: String,
+                     brand: String,
+                     model: String,
+                     lat: Double,
+                     lon: Double)
 
 trait LockedCar extends Car {
   def unlock: Future[Unit]
