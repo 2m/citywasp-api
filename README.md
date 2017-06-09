@@ -1,0 +1,1 @@
+[![Download](https://api.bintray.com/packages/2m/maven/citywasp-api/images/download.svg)](https://bintray.com/2m/maven/citywasp-api/_latestVersion) [![Build Status](https://travis-ci.org/2m/citywasp-api.svg?branch=master)](https://travis-ci.org/2m/citywasp-api)
