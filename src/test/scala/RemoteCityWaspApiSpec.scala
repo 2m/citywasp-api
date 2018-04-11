@@ -10,7 +10,7 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import com.typesafe.config._
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.{Matchers, WordSpec}
 import org.scalatest.concurrent.ScalaFutures
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -49,50 +49,51 @@ class RemoteCityWaspApiSpec extends WordSpec with Matchers with ScalaFutures {
     """)
 
     val route =
-      pathPrefix("lt") {
-        pathPrefix("auth") {
-          pathSingleSlash {
-            get {
-              optionalCookie(config.getString("citywasp.session-cookie")) {
-                case Some(cookie) => {
-                  implicit val mar = ScalaXmlSupport.nodeSeqMarshaller(MediaTypes.`text/html`)
-                  complete {
-                    <html>
+    pathPrefix("lt") {
+      pathPrefix("auth") {
+        pathSingleSlash {
+          get {
+            optionalCookie(config.getString("citywasp.session-cookie")) {
+              case Some(cookie) => {
+                implicit val mar = ScalaXmlSupport.nodeSeqMarshaller(MediaTypes.`text/html`)
+                complete {
+                  <html>
                       <body>
                         <form name="login">
                           <input name="login[_token]" value="c62ETPyxEh3t2QkZsxjPGaD9cEfgqG668OEjYDDQinw" />
                         </form>
                       </body>
                     </html>
-                  }
                 }
-                case None =>
-                  setCookie(HttpCookie(config.getString("citywasp.session-cookie"), value = "test_session_id"))(
-                    complete("Session created."))
               }
+              case None =>
+                setCookie(HttpCookie(config.getString("citywasp.session-cookie"), value = "test_session_id"))(
+                  complete("Session created.")
+                )
             }
-          } ~
-          pathPrefix("login") {
-            pathSingleSlash {
-              post {
-                formFields("login[_token]", "login[email]", "login[password]") { (token, email, password) =>
-                  val location = if (allowLogin) "/lt/?showInfo=1" else "/lt/auth/"
-                  redirect(location, StatusCodes.Found)
-                }
+          }
+        } ~
+        pathPrefix("login") {
+          pathSingleSlash {
+            post {
+              formFields("login[_token]", "login[email]", "login[password]") { (token, email, password) =>
+                val location = if (allowLogin) "/lt/?showInfo=1" else "/lt/auth/"
+                redirect(location, StatusCodes.Found)
               }
             }
           }
         }
-      } ~
-      pathPrefix("mobile") {
-        pathPrefix("lt") {
-          pathPrefix("reservation") {
-            path("active") {
-              implicit val mar = ScalaXmlSupport.nodeSeqMarshaller(MediaTypes.`text/html`)
-              carStatus match {
-                case Reserved =>
-                  complete {
-                    <html>
+      }
+    } ~
+    pathPrefix("mobile") {
+      pathPrefix("lt") {
+        pathPrefix("reservation") {
+          path("active") {
+            implicit val mar = ScalaXmlSupport.nodeSeqMarshaller(MediaTypes.`text/html`)
+            carStatus match {
+              case Reserved =>
+                complete {
+                  <html>
                       <body>
                         <script type="text/javascript">
                           var currentTime = 833000;
@@ -102,40 +103,40 @@ class RemoteCityWaspApiSpec extends WordSpec with Matchers with ScalaFutures {
                         </div>
                       </body>
                     </html>
-                  }
-                case Unlocked =>
-                  complete {
-                    <html>
+                }
+              case Unlocked =>
+                complete {
+                  <html>
                       <body>
                         <div>
                           <a href="/mobile/lt/reservation/stop/177"/>
                         </div>
                       </body>
                     </html>
-                  }
-                case NoCar =>
-                  complete {
-                    <html>
+                }
+              case NoCar =>
+                complete {
+                  <html>
                       <body>
                         <div class="error-msg">Duomenų nėra</div>
                       </body>
                     </html>
-                  }
-                case Error =>
-                  complete {
-                    <html></html>
-                  }
-              }
-            } ~
-            path("start" / IntNumber) { carId =>
-              if (allowUnlock) redirect("/mobile/lt/reservation/active", StatusCodes.Found) else complete("Ohi")
-            } ~
-            path("stop" / IntNumber) { carId =>
-              if (allowLock) redirect("/lt/", StatusCodes.Found) else complete("Ohi")
+                }
+              case Error =>
+                complete {
+                  <html></html>
+                }
             }
+          } ~
+          path("start" / IntNumber) { carId =>
+            if (allowUnlock) redirect("/mobile/lt/reservation/active", StatusCodes.Found) else complete("Ohi")
+          } ~
+          path("stop" / IntNumber) { carId =>
+            if (allowLock) redirect("/lt/", StatusCodes.Found) else complete("Ohi")
           }
         }
       }
+    }
 
     val binding = Await.result(Http().bindAndHandle(route, "localhost", 0), 1.second)
 
@@ -143,13 +144,14 @@ class RemoteCityWaspApiSpec extends WordSpec with Matchers with ScalaFutures {
       testCode(
         ConfigFactory
           .parseString(
-            s"""citywasp.url = "http://${binding.localAddress.getHostString}:${binding.localAddress.getPort}"""")
+            s"""citywasp.url = "http://${binding.localAddress.getHostString}:${binding.localAddress.getPort}""""
+          )
           .withFallback(config)
-          .getConfig("citywasp"))
+          .getConfig("citywasp")
+      )
     } finally {
       Await.ready(binding.unbind(), 1.second)
-      sys.shutdown()
-      sys.awaitTermination()
+      Await.ready(sys.terminate(), 5.seconds)
     }
   }
 
