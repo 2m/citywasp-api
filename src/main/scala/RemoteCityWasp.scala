@@ -23,7 +23,7 @@ object RemoteCityWasp {
 
   trait Common {
     def config: Config
-    def request: Req          = request("")
+    def request: Req = request("")
     def request(path: String) = url(config.getString("url") + path)
   }
 
@@ -77,8 +77,8 @@ object RemoteCityWasp {
       with Common {
     def login = {
       val credentials = Map(
-        "login[_token]"   -> challenge,
-        "login[email]"    -> config.getString("email"),
+        "login[_token]" -> challenge,
+        "login[email]" -> config.getString("email"),
         "login[password]" -> config.getString("password")
       )
       val LoginSuccess = ".*showInfo.*".r
@@ -102,7 +102,7 @@ object RemoteCityWasp {
       val CarReserved =
         "(?s).*currentTime = ([0-9]+);.*reservation/start/([0-9]+).*".r
       val CarUnlocked = "(?s).*reservation/stop/([0-9]+).*".r
-      val NoCar       = """(?s).*msg">[\s]*Duomen.*""".r
+      val NoCar = """(?s).*msg">[\s]*Duomen.*""".r
       waspHttp(request / "mobile" / "lt" / "reservation" / "active" addCookie (sessionCookie) OK as.String)
         .flatMap {
           case CarReserved(msLeft, carId) =>
