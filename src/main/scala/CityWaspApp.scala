@@ -1,6 +1,7 @@
 package citywasp.api
 
 import com.typesafe.config.ConfigFactory
+import scala.util._
 
 object CityWaspApp extends App {
 
@@ -25,7 +26,12 @@ object CityWaspApp extends App {
              }
   } yield status
 
-  greeting.onComplete(println)
+  greeting.onComplete {
+    case Success(s) => println(s)
+    case Failure(ex) =>
+      println(ex.getMessage)
+      ex.printStackTrace()
+  }
 
   scala.io.StdIn.readLine()
 
