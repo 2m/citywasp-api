@@ -1,38 +1,47 @@
 package citywasp.api
 
+import akka.Done
+import akka.actor.ActorSystem
+import akka.stream.{ActorMaterializer, Materializer}
 import com.typesafe.config.ConfigFactory
+
 import scala.util._
 
-object CityWaspApp extends App {
+object CityWaspApp {
 
-  import scala.concurrent.ExecutionContext.Implicits.global
+  def main(args: Array[String]): Unit = {
+    implicit val sys = ActorSystem("CityWaspApp")
+    implicit val mat = ActorMaterializer()
 
-  val config = ConfigFactory.load().getConfig("citywasp")
-
-  implicit val cw = RemoteCityWasp(config)
-  val greeting = for {
-    session <- CityWasp.session
-    _ = println(s"Session: $session")
-    challenge <- session.loginChallenge
-    _ = println(s"Challenge: $challenge")
-    login <- challenge.login
-    _ = println(s"Login: $login")
-    parkedCars <- login.parkedCars
-    _ = println(s"Parked cars: ${parkedCars.toList}")
-    status <- login.currentCar.map {
-      case Some(c: LockedCar) => "car locked"
-      case Some(c: UnlockedCar) => "car unlocked"
-      case None => "no car"
+    try {
+      run()
+      scala.io.StdIn.readLine()
+    } finally {
+      sys.terminate()
     }
-  } yield status
-
-  greeting.onComplete {
-    case Success(s) => println(s)
-    case Failure(ex) =>
-      println(ex.getMessage)
-      ex.printStackTrace()
   }
 
-  scala.io.StdIn.readLine()
+  private def run()(implicit sys: ActorSystem, mat: Materializer) = {
+    val config = ConfigFactory.load().getConfig("citywasp")
 
+    import sys.dispatcher
+
+    implicit val cw = RemoteCityWasp(config)
+    val greeting = for {
+      start <- CityWasp(cw)
+      login <- start.login
+      _ = println(s"Login: $login")
+      availableCars <- login.availableCars
+      _ = println(s"Parked cars: ${availableCars.toList}")
+      carsDetails <- login.carsDetails
+      _ = println(s"Cars details: ${carsDetails.toList}")
+    } yield Done
+
+    greeting.onComplete {
+      case Success(s) => println(s)
+      case Failure(ex) =>
+        println(ex.getMessage)
+        ex.printStackTrace()
+    }
+  }
 }
