@@ -1,159 +1,109 @@
 package citywasp.api
 
 import com.typesafe.config.Config
-import com.ning.http.client.cookie.Cookie
-import com.ning.http.client.Response
-import dispatch._
-import dispatch.Defaults._
 
 import scala.concurrent.Future
-import scala.collection.JavaConversions._
-import java.util.concurrent.TimeUnit
-
-import scala.util.matching.Regex
+import akka.actor.ActorSystem
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.marshalling.Marshal
+import akka.http.scaladsl.marshalling.Marshaller._
+import akka.http.scaladsl.model.Uri.Path
+import akka.http.scaladsl.model._
+import akka.http.scaladsl.model.headers.{OAuth2BearerToken, RawHeader}
+import akka.http.scaladsl.unmarshalling.Unmarshal
+import akka.stream.Materializer
+import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
+import io.circe._
 
 object RemoteCityWasp {
 
-  implicit class RichResponse(r: Response) {
-    def header(name: String): Option[String] = {
-      val headers = r.getHeaders(name)
-      if (headers == null) None else headers.headOption
+  private object RemoteCityWasp extends FailFastCirceSupport {
+    case class AuthResponse(accessToken: String)
+
+    implicit val decodeAuthResponse = new Decoder[AuthResponse] {
+      final def apply(c: HCursor) =
+        for {
+          accessToken <- c.downField("access_token").as[String]
+        } yield AuthResponse(accessToken)
     }
   }
 
-  trait Common {
-    def config: Config
-    def request: Req = request("")
-    def request(path: String) = url(config.getString("url") + path)
-  }
+  private case class RemoteCityWasp()(implicit sys: ActorSystem, mat: Materializer, config: Config) extends CityWasp {
+    import RemoteCityWasp._
+    import sys.dispatcher
 
-  case class RemoteCityWasp(config: Config) extends CityWasp with Common {
-    val waspHttp = Http.configure {
-      _.setAllowPoolingConnections(config.getBoolean("http.connection-pooling"))
-        .setConnectTimeout(
-          config
-            .getDuration("http.connection-timeout", TimeUnit.MILLISECONDS)
-            .toInt
+    def login: Future[LoggedIn] = {
+      val uri = Uri(config.getString("url.auth")).withPath(Path / "token")
+
+      val form = FormData(
+        Map(
+          "grant_type" -> "password",
+          "username" -> config.getString("email"),
+          "password" -> config.getString("password")
         )
-        .setRequestTimeout(
-          config
-            .getDuration("http.request-timeout", TimeUnit.MILLISECONDS)
-            .toInt
-        )
-        .setCompressionEnforced(config.getBoolean("http.compression"))
-        .setUserAgent(config.getString("http.user-agent"))
-    }
-
-    def session = {
-      val sessionCookieName = config.getString("session-cookie")
-      val sessionCookie = for {
-        response <- waspHttp(request("/lt/auth/"))
-      } yield response.getCookies.find(_.getName == sessionCookieName)
-
-      sessionCookie.flatMap {
-        case Some(c) =>
-          Future.successful(RemoteSession(waspHttp, config: Config, c))
-        case None =>
-          Future.failed(new Error(s"Did not get a $sessionCookieName cookie."))
-      }
-    }
-  }
-
-  private case class RemoteSession(waspHttp: Http, config: Config, sessionCookie: Cookie) extends Session with Common {
-    def loginChallenge = {
-      val Challenge = """(?s).*token]" value="([A-Za-z0-9_\-]+)".*""".r
-      waspHttp(request("/lt/auth/") addCookie (sessionCookie) OK as.String)
-        .flatMap {
-          case Challenge(token) =>
-            Future.successful(RemoteLoginChallenge(waspHttp, config, sessionCookie, token))
-          case s =>
-            Future.failed(new Error(s"Did not get login challenge token in $s."))
-        }
-    }
-  }
-
-  private case class RemoteLoginChallenge(waspHttp: Http, config: Config, sessionCookie: Cookie, challenge: String)
-      extends LoginChallenge
-      with Common {
-    def login = {
-      val credentials = Map(
-        "login[_token]" -> challenge,
-        "login[email]" -> config.getString("email"),
-        "login[password]" -> config.getString("password")
       )
-      val LoginSuccess = ".*showInfo.*".r
-      val LoginFailure = ".*auth.*".r
-      waspHttp(request("/lt/auth/login/") << credentials addCookie (sessionCookie))
-        .map(_.header("Location").headOption)
-        .flatMap {
-          case Some("/lt/?showInfo=1") =>
-            Future.successful(RemoteLoggedIn(waspHttp, config, sessionCookie))
-          case Some("/lt/auth/") =>
-            Future.failed(new Error(s"Unable to log in. Check username/password."))
-          case _ => Future.failed(new Error(s"Error while logging in."))
-        }
+
+      for {
+        req <- Marshal((HttpMethods.POST, uri, form)).to[HttpRequest]
+        res <- Http().singleRequest(req)
+        auth <- Unmarshal(res.entity).to[AuthResponse]
+      } yield RemoteLoggedIn(auth)
     }
   }
 
-  private case class RemoteLoggedIn(waspHttp: Http, config: Config, sessionCookie: Cookie)
-      extends LoggedIn
-      with Common {
-    def currentCar = {
-      val CarReserved =
-        "(?s).*currentTime = ([0-9]+);.*reservation/start/([0-9]+).*".r
-      val CarUnlocked = "(?s).*reservation/stop/([0-9]+).*".r
-      val NoCar = """(?s).*msg">[\s]*Duomen.*""".r
-      waspHttp(request / "mobile" / "lt" / "reservation" / "active" addCookie (sessionCookie) OK as.String)
-        .flatMap {
-          case CarReserved(msLeft, carId) =>
-            Future.successful(Some(RemoteLockedCar(waspHttp, config, sessionCookie, carId)))
-          case CarUnlocked(carId) =>
-            Future.successful(Some(RemoteUnlockedCar(waspHttp, config, sessionCookie, carId)))
-          case NoCar() => Future.successful(None)
-          case _ =>
-            Future.failed(new Error(s"Error while getting current car."))
-        }
+  private object RemoteLoggedIn extends FailFastCirceSupport {
+    implicit val decodeCar = new Decoder[Car] {
+      final def apply(c: HCursor) =
+        for {
+          id <- c.downField("id").as[Int]
+          lat <- c.downField("lat").as[Double]
+          lon <- c.downField("long").as[Double]
+        } yield Car(id, lat, lon)
     }
 
-    def parkedCars = {
-      val CarListing =
-        """(?s)"id":([0-9]+),"licensePlate":"([A-Z0-9]+)","brand":"([A-Za-z0-9 ]+)","model":"([A-Za-z0-9 \\]+).*?"lat":([0-9\.]+),"lon":([0-9\.]+)""".r
-      waspHttp(request / "mobile" / "lt" / "" addCookie (sessionCookie) OK as.String)
-        .map(
-          resp =>
-            CarListing.findAllMatchIn(resp).toSeq.map { m =>
-              ParkedCar(m.group(1).toInt, m.group(2), m.group(3), m.group(4), m.group(5).toDouble, m.group(6).toDouble)
-          }
-        )
+    implicit val decodeCarDetails = new Decoder[CarDetails] {
+      final def apply(c: HCursor) =
+        for {
+          id <- c.downField("id").as[Int]
+          licensePlate <- c.downField("license_plate").as[String]
+          brand <- c.downField("make").as[String]
+          model <- c.downField("model").as[String]
+        } yield CarDetails(id, licensePlate, brand, model)
     }
   }
 
-  private case class RemoteLockedCar(waspHttp: Http, config: Config, sessionCookie: Cookie, carId: String)
-      extends LockedCar
-      with Common {
-    def unlock =
-      waspHttp(request / "mobile" / "lt" / "reservation" / "start" / carId addCookie (sessionCookie))
-        .map(_.header("Location"))
-        .flatMap {
-          case Some("/mobile/lt/reservation/active") => Future.successful(())
-          case _ =>
-            Future.failed(new Error(s"Error while unlocking current car."))
-        }
+  private case class RemoteLoggedIn(auth: RemoteCityWasp.AuthResponse)(implicit sys: ActorSystem,
+                                                                       mat: Materializer,
+                                                                       config: Config)
+      extends LoggedIn {
+    import RemoteLoggedIn._
+    import sys.dispatcher
+
+    override def availableCars: Future[Seq[Car]] = {
+      val uri = Uri(config.getString("url.app")).withPath(Path / "api" / "CarsLive" / "GetAvailableCars")
+
+      for {
+        req <- Marshal(uri)
+          .to[HttpRequest]
+          .map(_.addCredentials(OAuth2BearerToken(auth.accessToken)).addHeader(RawHeader("App-Version", "4.1.4")))
+        res <- Http().singleRequest(req)
+        cars <- Unmarshal(res.entity).to[Seq[Car]]
+      } yield cars
+    }
+
+    override def carsDetails: Future[Seq[CarDetails]] = {
+      val uri = Uri(config.getString("url.app")).withPath(Path / "api" / "CarsLive" / "GetCarsDetails")
+
+      for {
+        req <- Marshal(uri)
+          .to[HttpRequest]
+          .map(_.addCredentials(OAuth2BearerToken(auth.accessToken)).addHeader(RawHeader("App-Version", "4.1.4")))
+        res <- Http().singleRequest(req)
+        details <- Unmarshal(res.entity).to[Seq[CarDetails]]
+      } yield details
+    }
   }
 
-  private case class RemoteUnlockedCar(waspHttp: Http, config: Config, sessionCookie: Cookie, carId: String)
-      extends UnlockedCar
-      with Common {
-    def lock =
-      waspHttp(request / "mobile" / "lt" / "reservation" / "stop" / carId addCookie (sessionCookie))
-        .map(_.header("Location").headOption)
-        .flatMap {
-          case Some("/lt/") => Future.successful(())
-          case _ =>
-            Future.failed(new Error(s"Error while locking current car."))
-        }
-  }
-
-  def apply(config: Config) = RemoteCityWasp(config)
-
+  def apply(config: Config)(implicit sys: ActorSystem, mat: Materializer): CityWasp =
+    RemoteCityWasp()(sys, mat, config)
 }
