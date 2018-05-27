@@ -17,9 +17,11 @@ This library is intended to be used as a dependency from other applications. How
 coursier launch citywasp:citywasp-api_2.12:0.4 -- -J-Dcitywasp.email=<email> -J-Dcitywasp.password=<password>
 ```
 
-Where *<email>* and *<password>* are the credentials to your Citybee account.
+Where `<email>` and `<password>` are the credentials to your Citybee account.
 
 ### sbt
+
+Checkout this repository to your computer and then run:
 
 ```bash
 sbt -Dcitywasp.email=<email> -Dcitywasp.password=<password>
