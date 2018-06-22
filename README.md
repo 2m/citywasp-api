@@ -14,7 +14,7 @@ This library is intended to be used as a dependency from other applications. How
 ### coursier
 
 ```bash
-coursier launch citywasp:citywasp-api_2.12:1.0 -- -J-Dcitywasp.email=<email> -J-Dcitywasp.password=<password>
+coursier launch citywasp:citywasp-api_2.12:1.1 -r bintray:2m/maven -- -J-Dcitywasp.email=<email> -J-Dcitywasp.password=<password>
 ```
 
 Where `<email>` and `<password>` are the credentials to your Citybee account.
