@@ -85,7 +85,10 @@ object RemoteCityWasp {
       for {
         req <- Marshal(uri)
           .to[HttpRequest]
-          .map(_.addCredentials(OAuth2BearerToken(auth.accessToken)).addHeader(RawHeader("App-Version", "4.1.4")))
+          .map(
+            _.addCredentials(OAuth2BearerToken(auth.accessToken))
+              .addHeader(RawHeader("App-Version", config.getString("app-version")))
+          )
         res <- Http().singleRequest(req)
         cars <- Unmarshal(res.entity).to[Seq[Car]]
       } yield cars
@@ -97,7 +100,10 @@ object RemoteCityWasp {
       for {
         req <- Marshal(uri)
           .to[HttpRequest]
-          .map(_.addCredentials(OAuth2BearerToken(auth.accessToken)).addHeader(RawHeader("App-Version", "4.1.4")))
+          .map(
+            _.addCredentials(OAuth2BearerToken(auth.accessToken))
+              .addHeader(RawHeader("App-Version", config.getString("app-version")))
+          )
         res <- Http().singleRequest(req)
         details <- Unmarshal(res.entity).to[Seq[CarDetails]]
       } yield details
