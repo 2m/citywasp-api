@@ -1,13 +1,13 @@
 organization := "citywasp"
 name := "citywasp-api"
 
-val Akka = "2.5.11"
-val AkkaHttp = "10.1.1"
+val Akka = "2.5.17"
+val AkkaHttp = "10.1.5"
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka"       %% "akka-stream"     % Akka,
   "com.typesafe.akka"       %% "akka-http"       % AkkaHttp,
-  "de.heikoseeberger"       %% "akka-http-circe" % "1.20.1",
+  "de.heikoseeberger"       %% "akka-http-circe" % "1.22.0",
   "org.scalatest"           %% "scalatest"       % "3.0.5"  % "test",
 )
 
