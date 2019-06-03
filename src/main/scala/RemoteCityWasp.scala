@@ -72,10 +72,11 @@ object RemoteCityWasp {
     }
   }
 
-  private case class RemoteLoggedIn(auth: RemoteCityWasp.AuthResponse)(implicit sys: ActorSystem,
-                                                                       mat: Materializer,
-                                                                       config: Config)
-      extends LoggedIn {
+  private case class RemoteLoggedIn(auth: RemoteCityWasp.AuthResponse)(
+      implicit sys: ActorSystem,
+      mat: Materializer,
+      config: Config
+  ) extends LoggedIn {
     import RemoteLoggedIn._
     import sys.dispatcher
 
