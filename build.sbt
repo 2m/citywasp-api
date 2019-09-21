@@ -2,7 +2,7 @@ organization := "citywasp"
 name := "citywasp-api"
 
 val Akka = "2.5.25"
-val AkkaHttp = "10.1.9"
+val AkkaHttp = "10.1.10"
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-stream"     % Akka,
