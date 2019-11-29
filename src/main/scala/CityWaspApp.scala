@@ -8,7 +8,6 @@ import com.typesafe.config.ConfigFactory
 import scala.util._
 
 object CityWaspApp {
-
   def main(args: Array[String]): Unit = {
     implicit val sys = ActorSystem("CityWaspApp")
     implicit val mat = ActorMaterializer()
