@@ -16,7 +16,6 @@ import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import io.circe._
 
 object RemoteCityWasp {
-
   private object RemoteCityWasp extends FailFastCirceSupport {
     case class AuthResponse(accessToken: String)
 
