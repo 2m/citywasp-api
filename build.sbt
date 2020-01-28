@@ -1,7 +1,7 @@
 organization := "citywasp"
 name := "citywasp-api"
 
-val Akka = "2.6.2"
+val Akka = "2.6.3"
 val AkkaHttp = "10.1.11"
 
 libraryDependencies ++= Seq(
