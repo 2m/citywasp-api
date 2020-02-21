@@ -8,7 +8,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-stream"     % Akka,
   "com.typesafe.akka" %% "akka-http"       % AkkaHttp,
   "de.heikoseeberger" %% "akka-http-circe" % "1.31.0",
-  "org.scalatest"     %% "scalatest"       % "3.1.0" % "test"
+  "org.scalatest"     %% "scalatest"       % "3.1.1" % "test"
 )
 
 licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
