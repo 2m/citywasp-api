@@ -15,9 +15,7 @@ object CityWaspApp {
     try {
       run()
       scala.io.StdIn.readLine()
-    } finally {
-      sys.terminate()
-    }
+    } finally sys.terminate()
   }
 
   private def run()(implicit sys: ActorSystem, mat: Materializer) = {

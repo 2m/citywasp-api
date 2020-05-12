@@ -71,8 +71,8 @@ object RemoteCityWasp {
     }
   }
 
-  private case class RemoteLoggedIn(auth: RemoteCityWasp.AuthResponse)(
-      implicit sys: ActorSystem,
+  private case class RemoteLoggedIn(auth: RemoteCityWasp.AuthResponse)(implicit
+      sys: ActorSystem,
       mat: Materializer,
       config: Config
   ) extends LoggedIn {
@@ -83,12 +83,13 @@ object RemoteCityWasp {
       val uri = Uri(config.getString("url.app")).withPath(Path / "api" / "CarsLive" / "GetAvailableCars")
 
       for {
-        req <- Marshal(uri)
-          .to[HttpRequest]
-          .map(
-            _.addCredentials(OAuth2BearerToken(auth.accessToken))
-              .addHeader(RawHeader("App-Version", config.getString("app-version")))
-          )
+        req <-
+          Marshal(uri)
+            .to[HttpRequest]
+            .map(
+              _.addCredentials(OAuth2BearerToken(auth.accessToken))
+                .addHeader(RawHeader("App-Version", config.getString("app-version")))
+            )
         res <- Http().singleRequest(req)
         cars <- Unmarshal(res.entity).to[Seq[Car]]
       } yield cars
@@ -98,12 +99,13 @@ object RemoteCityWasp {
       val uri = Uri(config.getString("url.app")).withPath(Path / "api" / "CarsLive" / "GetCarsDetails")
 
       for {
-        req <- Marshal(uri)
-          .to[HttpRequest]
-          .map(
-            _.addCredentials(OAuth2BearerToken(auth.accessToken))
-              .addHeader(RawHeader("App-Version", config.getString("app-version")))
-          )
+        req <-
+          Marshal(uri)
+            .to[HttpRequest]
+            .map(
+              _.addCredentials(OAuth2BearerToken(auth.accessToken))
+                .addHeader(RawHeader("App-Version", config.getString("app-version")))
+            )
         res <- Http().singleRequest(req)
         details <- Unmarshal(res.entity).to[Seq[CarDetails]]
       } yield details
