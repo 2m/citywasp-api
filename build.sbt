@@ -7,7 +7,7 @@ val AkkaHttp = "10.2.2"
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-stream"     % Akka,
   "com.typesafe.akka" %% "akka-http"       % AkkaHttp,
-  "de.heikoseeberger" %% "akka-http-circe" % "1.35.2",
+  "de.heikoseeberger" %% "akka-http-circe" % "1.35.3",
   "org.scalatest"     %% "scalatest"       % "3.2.3" % "test"
 )
 
