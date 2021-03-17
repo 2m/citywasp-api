@@ -1,6 +1,8 @@
 organization := "citywasp"
 name := "citywasp-api"
 
+scalaVersion := "2.13.5"
+
 val Akka = "2.6.13"
 val AkkaHttp = "10.2.4"
 
@@ -11,6 +13,14 @@ libraryDependencies ++= Seq(
   "org.scalatest"     %% "scalatest"       % "3.2.6" % "test"
 )
 
-licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
+scalafmtOnCompile := true
+scalafixOnCompile := true
 
-scalafmtOnCompile in ThisBuild := true
+ThisBuild / scalafixDependencies ++= Seq(
+  "com.nequissimus" %% "sort-imports" % "0.5.5"
+)
+
+enablePlugins(AutomateHeaderPlugin)
+startYear := Some(2015)
+organizationName := "github.com/2m/citywasp-api/contributors"
+licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.txt"))
