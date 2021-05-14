@@ -10,7 +10,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-stream"     % Akka,
   "com.typesafe.akka" %% "akka-http"       % AkkaHttp,
   "de.heikoseeberger" %% "akka-http-circe" % "1.36.0",
-  "org.scalatest"     %% "scalatest"       % "3.2.8" % "test"
+  "org.scalatest"     %% "scalatest"       % "3.2.9" % "test"
 )
 
 scalafmtOnCompile := true
