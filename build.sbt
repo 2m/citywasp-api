@@ -1,7 +1,7 @@
 organization := "citywasp"
 name := "citywasp-api"
 
-scalaVersion := "2.13.5"
+scalaVersion := "2.13.6"
 
 val Akka = "2.6.14"
 val AkkaHttp = "10.2.4"
