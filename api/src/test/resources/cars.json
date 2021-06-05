@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1369,
+    "service_id": 11,
+    "lat": 1.1,
+    "long": 2.2,
+    "price": 0.27,
+    "is_electric": false,
+    "is_cargo": true,
+    "fuel_level": 68,
+    "address": "address1",
+    "city": null
+  },
+  {
+    "id": 1370,
+    "service_id": 11,
+    "lat": 3.3,
+    "long": 4.4,
+    "price": 0.27,
+    "is_electric": false,
+    "is_cargo": true,
+    "fuel_level": 52,
+    "address": "address2",
+    "city": "city2"
+  }
+]

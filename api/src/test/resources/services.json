@@ -1,0 +1,57 @@
+[
+  {
+    "ServiceId": 21,
+    "ServiceType": 1,
+    "ServiceName": "service1",
+    "IconUri": "https://url.net/image1.png",
+    "PricingId": 29,
+    "PricingName": "pricing1",
+    "Pricing": {
+      "first_minute_price": 0,
+      "next_minute_price": 0.5,
+      "minute_price": 0,
+      "hour_price": 1,
+      "day_price": 24,
+      "week_price": 167.99,
+      "month_price": 719.96,
+      "distance_prices": [],
+      "parking_price": 1
+    },
+    "ListingName": "listing1",
+    "MinutePrice": 0,
+    "IsVisible": false,
+    "IsPremium": false,
+    "ServiceCategory": 0
+  },
+  {
+    "ServiceId": 19,
+    "ServiceType": 0,
+    "ServiceName": "service2",
+    "IconUri": "https://url.net/image2.png",
+    "PricingId": 136,
+    "PricingName": "pricing2",
+    "Pricing": {
+      "first_minute_price": 0.27,
+      "next_minute_price": 0.27,
+      "minute_price": 0.27,
+      "hour_price": 8.9,
+      "day_price": 39.9,
+      "week_price": 239,
+      "month_price": 599,
+      "distance_prices": [
+        {
+          "price": 0.24,
+          "interval_from": 0,
+          "interval_to": null,
+          "is_applied_everyday_first": false
+        }
+      ],
+      "parking_price": 1
+    },
+    "ListingName": "listing2",
+    "MinutePrice": 0.27,
+    "IsVisible": false,
+    "IsPremium": false,
+    "ServiceCategory": 3
+  }
+]
