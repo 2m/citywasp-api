@@ -2,9 +2,13 @@ val Tapir = "0.18.0-M11"
 val Circe = "0.13.0"
 val Ciris = "2.0.1"
 
+lazy val citywasp = project
+  .in(file("."))
+  .settings(sonatypeProfileName := "lt.dvim")
+  .aggregate(api, cli)
+
 lazy val api = (project in file("api"))
   .settings(
-    commonSettings,
     name := "citywasp-api",
     libraryDependencies ++= Seq(
       "com.softwaremill.sttp.tapir" %% "tapir-core"           % Tapir,
@@ -20,7 +24,6 @@ lazy val api = (project in file("api"))
 
 lazy val cli = (project in file("cli"))
   .settings(
-    commonSettings,
     name := "citywasp-cli",
     libraryDependencies ++= Seq(
       "is.cir"                        %% "ciris"               % Ciris,
@@ -33,31 +36,28 @@ lazy val cli = (project in file("cli"))
   .dependsOn(api)
   .enablePlugins(AutomateHeaderPlugin, JavaAppPackaging)
 
-lazy val commonSettings = Seq(
-  organization := "lt.dvim.citywasp",
-  scalaVersion := "2.13.6",
-  scalacOptions += "-Ymacro-annotations",
-  scalafmtOnCompile := true,
-  scalafixOnCompile := true,
-  startYear := Some(2015),
-  organizationName := "github.com/2m/citywasp-api/graphs/contributors",
-  licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.txt")),
-  homepage := Some(url("https://github.com/2m/citywasp-api")),
-  developers := List(
-    Developer(
-      "contributors",
-      "Contributors",
-      "https://gitter.im/2m/general",
-      url("https://github.com/2m/citywasp-api/graphs/contributors")
-    )
-  ),
-  sonatypeProfileName := "lt.dvim",
-  versionScheme := Some("semver-spec")
+inThisBuild(
+  Seq(
+    organization := "lt.dvim.citywasp",
+    scalaVersion := "2.13.6",
+    scalacOptions += "-Ymacro-annotations",
+    scalafmtOnCompile := true,
+    scalafixOnCompile := true,
+    scalafixDependencies ++= Seq(
+      "com.nequissimus" %% "sort-imports" % "0.5.5"
+    ),
+    startYear := Some(2015),
+    organizationName := "github.com/2m/citywasp-api/graphs/contributors",
+    licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.txt")),
+    homepage := Some(url("https://github.com/2m/citywasp-api")),
+    developers := List(
+      Developer(
+        "contributors",
+        "Contributors",
+        "https://gitter.im/2m/general",
+        url("https://github.com/2m/citywasp-api/graphs/contributors")
+      )
+    ),
+    versionScheme := Some("semver-spec")
+  )
 )
-
-ThisBuild / scalafixDependencies ++= Seq(
-  "com.nequissimus" %% "sort-imports" % "0.5.5"
-)
-
-publish / skip := true
-disablePlugins(HeaderPlugin)
