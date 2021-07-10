@@ -1,9 +1,12 @@
-# Citywasp API [![bintray-badge][]][bintray] [![travis-badge][]][travis]
+# [Citywasp API][] [![scaladex-badge][]][scaladex] [![ci-badge][]][ci] [![gitter-badge][]][gitter]
 
-[bintray]:               https://bintray.com/2m/maven/citywasp-api
-[bintray-badge]:         https://api.bintray.com/packages/2m/maven/citywasp-api/images/download.svg
-[travis]:                https://travis-ci.org/2m/citywasp-api
-[travis-badge]:          https://travis-ci.org/2m/citywasp-api.svg?branch=master
+[Citywasp API]:       https://github.com/2m/citywasp-api
+[scaladex]:           https://index.scala-lang.org/2m/citywasp-api
+[scaladex-badge]:     https://index.scala-lang.org/2m/citywasp-api/latest.svg
+[ci]:                 https://github.com/2m/citywasp-api/actions
+[ci-badge]:           https://github.com/2m/citywasp-api/workflows/ci/badge.svg
+[gitter]:             https://gitter.im/2m/general
+[gitter-badge]:       https://badges.gitter.im/2m/general.svg
 
 This is a Scala API for [Citybee](https://www.citybee.lt) car sharing application. Currently it is capable of returning the list of all car descriptions and a list of all available cars.
 
@@ -14,18 +17,20 @@ This library is intended to be used as a dependency from other applications. How
 ### coursier
 
 ```bash
-coursier launch citywasp:citywasp-api_2.12:1.1 -r bintray:2m/maven -- -J-Dcitywasp.email=<email> -J-Dcitywasp.password=<password>
+coursier launch lt.dvim.citywasp::citywasp-cli:latest.version \
+    -Dapp=<app-version> \
+    -Duris=<backend-uri-1>[,<backend-uri-n>]
 ```
-
-Where `<email>` and `<password>` are the credentials to your Citybee account.
 
 ### sbt
 
 Checkout this repository to your computer and then run:
 
 ```bash
-sbt -Dcitywasp.email=<email> -Dcitywasp.password=<password>
-sbt:citywasp-api> run
+sbtn stage
+cli/target/universal/stage/bin/citywasp-cli \
+    -Dapp=<app-version> \
+    -Duris=<backend-uri-1>[,<backend-uri-n>]
 ```
 
 ## Usages
