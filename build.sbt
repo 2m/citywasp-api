@@ -59,4 +59,5 @@ ThisBuild / scalafixDependencies ++= Seq(
   "com.nequissimus" %% "sort-imports" % "0.5.5"
 )
 
+publish / skip := true
 disablePlugins(HeaderPlugin)
