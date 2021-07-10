@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 val Tapir = "0.18.0-M11"
 val Circe = "0.14.1"
+=======
+val Tapir = "0.18.0"
+val Circe = "0.13.0"
+>>>>>>> 372cacd (Update tapir-core, tapir-json-circe, ... to 0.18.0)
 val Ciris = "2.0.1"
 
 lazy val citywasp = project
