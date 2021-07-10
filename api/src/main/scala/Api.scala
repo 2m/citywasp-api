@@ -39,7 +39,7 @@ object Api {
       .in(header("software", "0"))
       .in(header[Token]("token"))
       .in(header("username", ""))
-      .mapInTo(Params.apply _)
+      .mapInTo[Params]
       .in("api")
       .errorOut(stringBody)
 

@@ -40,8 +40,8 @@ object Main extends IOApp with ConfigDecoders with CatsEffectSupport {
 
   private def cars(appVersion: AppVersion)(uri: Uri) = {
     val params = Params.default.copy(appVersion = appVersion, country = Country.fromUri(uri))
-    val servicesRequest = SttpClientInterpreter.toRequest(Api.AvailableServices.Get, Some(uri)).apply(params)
-    val carsRequest = SttpClientInterpreter.toRequest(Api.CarsLive.GetAvailableCars, Some(uri)).apply(params)
+    val servicesRequest = SttpClientInterpreter().toRequest(Api.AvailableServices.Get, Some(uri)).apply(params)
+    val carsRequest = SttpClientInterpreter().toRequest(Api.CarsLive.GetAvailableCars, Some(uri)).apply(params)
     for {
       services <- backend.use(servicesRequest.send(_)).flatMap(_.body.load)
       cars <- backend.use(carsRequest.send(_)).flatMap(_.body.load)

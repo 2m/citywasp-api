@@ -46,7 +46,7 @@ class ApiSuite extends munit.FunSuite with DecodeResultOps {
   )
 
   test("Api.AvailableServices.Get - request") {
-    val request = SttpClientInterpreter.toRequest(Api.AvailableServices.Get, uri)
+    val request = SttpClientInterpreter().toRequest(Api.AvailableServices.Get, uri)
     val prepared = request(params)
     assertEquals(prepared.uri.toString, "test.lt/api/AvailableServices/Get")
     assertEquals(prepared.headers, expectedHeaders)
@@ -56,7 +56,7 @@ class ApiSuite extends munit.FunSuite with DecodeResultOps {
     val testingBackend = SttpBackendStub.synchronous
       .whenRequestMatches(_ => true)
       .thenRespond(Files.readString(Paths.get(getClass.getResource("/services.json").toURI())))
-    val request = SttpClientInterpreter.toRequest(Api.AvailableServices.Get, uri)
+    val request = SttpClientInterpreter().toRequest(Api.AvailableServices.Get, uri)
     val prepared = request(params)
     val response = prepared.send(testingBackend)
 
@@ -65,7 +65,7 @@ class ApiSuite extends munit.FunSuite with DecodeResultOps {
   }
 
   test("Api.CarsLive.GetAvailableCars - request") {
-    val request = SttpClientInterpreter.toRequest(Api.CarsLive.GetAvailableCars, uri)
+    val request = SttpClientInterpreter().toRequest(Api.CarsLive.GetAvailableCars, uri)
     val prepared = request(params)
     assertEquals(prepared.uri.toString, "test.lt/api/CarsLive/GetAvailableCars")
     assertEquals(prepared.headers, expectedHeaders)
@@ -75,7 +75,7 @@ class ApiSuite extends munit.FunSuite with DecodeResultOps {
     val testingBackend = SttpBackendStub.synchronous
       .whenRequestMatches(_ => true)
       .thenRespond(Files.readString(Paths.get(getClass.getResource("/cars.json").toURI())))
-    val request = SttpClientInterpreter.toRequest(Api.CarsLive.GetAvailableCars, uri)
+    val request = SttpClientInterpreter().toRequest(Api.CarsLive.GetAvailableCars, uri)
     val prepared = request(params)
     val response = prepared.send(testingBackend)
 
