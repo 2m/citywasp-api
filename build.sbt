@@ -1,5 +1,5 @@
 val Tapir = "0.18.0-M11"
-val Circe = "0.13.0"
+val Circe = "0.14.1"
 val Ciris = "2.0.1"
 
 lazy val citywasp = project
