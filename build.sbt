@@ -58,3 +58,5 @@ lazy val commonSettings = Seq(
 ThisBuild / scalafixDependencies ++= Seq(
   "com.nequissimus" %% "sort-imports" % "0.5.5"
 )
+
+disablePlugins(HeaderPlugin)
