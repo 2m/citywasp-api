@@ -92,7 +92,7 @@ class ApiSuite extends munit.FunSuite with DecodeResultOps {
           false,
           true,
           68,
-          "address1",
+          Some("address1"),
           None
         ),
         Car(
@@ -104,8 +104,20 @@ class ApiSuite extends munit.FunSuite with DecodeResultOps {
           false,
           true,
           52,
-          "address2",
+          Some("address2"),
           Some("city2")
+        ),
+        Car(
+          1371,
+          11,
+          BigDecimal("5.5"),
+          BigDecimal("6.6"),
+          BigDecimal("0.27"),
+          false,
+          true,
+          53,
+          None,
+          None
         )
       )
     )

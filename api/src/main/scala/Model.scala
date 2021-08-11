@@ -85,7 +85,7 @@ sealed trait CarModel {
       isElectric: Boolean,
       isCargo: Boolean,
       fuelLevel: Int,
-      address: String,
+      address: Option[String],
       city: Option[String]
   )
 }
