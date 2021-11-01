@@ -39,7 +39,7 @@ lazy val cli = (project in file("cli"))
 inThisBuild(
   Seq(
     organization := "lt.dvim.citywasp",
-    scalaVersion := "2.13.6",
+    scalaVersion := "2.13.7",
     scalacOptions += "-Ymacro-annotations",
     scalafmtOnCompile := true,
     scalafixOnCompile := true,
