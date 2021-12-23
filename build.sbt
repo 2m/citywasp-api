@@ -44,7 +44,7 @@ inThisBuild(
     scalafmtOnCompile := true,
     scalafixOnCompile := true,
     scalafixDependencies ++= Seq(
-      "com.nequissimus" %% "sort-imports" % "0.6.0"
+      "com.nequissimus" %% "sort-imports" % "0.6.1"
     ),
     startYear := Some(2015),
     organizationName := "github.com/2m/citywasp-api/graphs/contributors",
