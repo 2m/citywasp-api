@@ -28,7 +28,7 @@ lazy val cli = (project in file("cli"))
     libraryDependencies ++= Seq(
       "is.cir"                        %% "ciris"               % Ciris,
       "is.cir"                        %% "ciris-refined"       % Ciris,
-      "org.typelevel"                 %% "cats-effect"         % "3.3.5",
+      "org.typelevel"                 %% "cats-effect"         % "3.3.6",
       "com.softwaremill.sttp.client3" %% "http4s-backend"      % "3.5.0",
       "org.http4s"                    %% "http4s-blaze-client" % "0.23.10"
     )
