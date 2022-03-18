@@ -30,7 +30,7 @@ lazy val cli = (project in file("cli"))
       "is.cir"                        %% "ciris-refined"       % Ciris,
       "org.typelevel"                 %% "cats-effect"         % "3.3.7",
       "com.softwaremill.sttp.client3" %% "http4s-backend"      % "3.5.1",
-      "org.http4s"                    %% "http4s-blaze-client" % "0.23.10"
+      "org.http4s"                    %% "http4s-blaze-client" % "0.23.11"
     )
   )
   .dependsOn(api)
