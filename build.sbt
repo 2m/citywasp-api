@@ -1,4 +1,4 @@
-val Tapir = "0.20.2"
+val Tapir = "1.0.1"
 val Circe = "0.14.1"
 val Ciris = "2.3.2"
 
@@ -28,9 +28,9 @@ lazy val cli = (project in file("cli"))
     libraryDependencies ++= Seq(
       "is.cir"                        %% "ciris"               % Ciris,
       "is.cir"                        %% "ciris-refined"       % Ciris,
-      "org.typelevel"                 %% "cats-effect"         % "3.3.11",
-      "com.softwaremill.sttp.client3" %% "http4s-backend"      % "3.6.1",
-      "org.http4s"                    %% "http4s-blaze-client" % "0.23.11"
+      "org.typelevel"                 %% "cats-effect"         % "3.3.13",
+      "com.softwaremill.sttp.client3" %% "http4s-backend"      % "3.6.2",
+      "org.http4s"                    %% "http4s-blaze-client" % "0.23.12"
     )
   )
   .dependsOn(api)
