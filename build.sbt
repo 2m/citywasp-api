@@ -1,4 +1,4 @@
-val Tapir = "1.1.2"
+val Tapir = "1.1.3"
 val Circe = "0.14.2"
 val Ciris = "2.4.0"
 
@@ -29,7 +29,7 @@ lazy val cli = (project in file("cli"))
       "is.cir"                        %% "ciris"               % Ciris,
       "is.cir"                        %% "ciris-refined"       % Ciris,
       "org.typelevel"                 %% "cats-effect"         % "3.3.14",
-      "com.softwaremill.sttp.client3" %% "http4s-backend"      % "3.8.2",
+      "com.softwaremill.sttp.client3" %% "http4s-backend"      % "3.8.3",
       "org.http4s"                    %% "http4s-blaze-client" % "0.23.12"
     )
   )
