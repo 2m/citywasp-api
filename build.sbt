@@ -1,4 +1,4 @@
-val Tapir = "1.2.2"
+val Tapir = "1.2.3"
 val Circe = "0.14.3"
 val Ciris = "3.0.0"
 
