@@ -1,6 +1,6 @@
-val Tapir = "0.20.2"
-val Circe = "0.14.1"
-val Ciris = "2.3.2"
+val Tapir = "1.2.6"
+val Circe = "0.14.3"
+val Ciris = "3.0.0"
 
 lazy val citywasp = project
   .in(file("."))
@@ -28,9 +28,9 @@ lazy val cli = (project in file("cli"))
     libraryDependencies ++= Seq(
       "is.cir"                        %% "ciris"               % Ciris,
       "is.cir"                        %% "ciris-refined"       % Ciris,
-      "org.typelevel"                 %% "cats-effect"         % "3.3.12",
-      "com.softwaremill.sttp.client3" %% "http4s-backend"      % "3.6.2",
-      "org.http4s"                    %% "http4s-blaze-client" % "0.23.12"
+      "org.typelevel"                 %% "cats-effect"         % "3.4.5",
+      "com.softwaremill.sttp.client3" %% "http4s-backend"      % "3.8.8",
+      "org.http4s"                    %% "http4s-blaze-client" % "0.23.13"
     )
   )
   .dependsOn(api)
@@ -39,7 +39,7 @@ lazy val cli = (project in file("cli"))
 inThisBuild(
   Seq(
     organization := "lt.dvim.citywasp",
-    scalaVersion := "2.13.7",
+    scalaVersion := "2.13.10",
     scalacOptions += "-Ymacro-annotations",
     scalafmtOnCompile := true,
     scalafixOnCompile := true,
