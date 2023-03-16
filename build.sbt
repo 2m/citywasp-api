@@ -29,7 +29,7 @@ lazy val cli = (project in file("cli"))
       "is.cir"                        %% "ciris"               % Ciris,
       "is.cir"                        %% "ciris-refined"       % Ciris,
       "org.typelevel"                 %% "cats-effect"         % "3.4.8",
-      "com.softwaremill.sttp.client3" %% "http4s-backend"      % "3.8.12",
+      "com.softwaremill.sttp.client3" %% "http4s-backend"      % "3.8.13",
       "org.http4s"                    %% "http4s-blaze-client" % "0.23.14"
     )
   )
