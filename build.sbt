@@ -1,5 +1,4 @@
-val Tapir = "1.2.12"
-val Circe = "0.14.3"
+val Tapir = "1.3.0"
 
 lazy val citywasp = project
   .in(file("."))
@@ -14,8 +13,8 @@ lazy val api = (project in file("api"))
       "com.softwaremill.sttp.tapir" %% "tapir-json-circe"     % Tapir,
       "com.softwaremill.sttp.tapir" %% "tapir-sttp-client"    % Tapir,
       "com.softwaremill.sttp.tapir" %% "tapir-refined"        % Tapir,
-      "io.circe"                    %% "circe-generic"        % Circe,
-      "io.circe"                    %% "circe-generic-extras" % Circe,
+      "io.circe"                    %% "circe-generic"        % "0.14.5",
+      "io.circe"                    %% "circe-generic-extras" % "0.14.3",
       "org.scalameta"               %% "munit"                % "0.7.29" % Test
     )
   )
@@ -43,7 +42,7 @@ inThisBuild(
     scalafmtOnCompile := true,
     scalafixOnCompile := true,
     scalafixDependencies ++= Seq(
-      "com.nequissimus" %% "sort-imports" % "0.6.0"
+      "com.nequissimus" %% "sort-imports" % "0.6.1"
     ),
     startYear := Some(2015),
     organizationName := "github.com/2m/citywasp-api/graphs/contributors",
