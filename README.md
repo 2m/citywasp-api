@@ -17,9 +17,7 @@ This library is intended to be used as a dependency from other applications. How
 ### coursier
 
 ```bash
-coursier launch lt.dvim.citywasp::citywasp-cli:latest.version -- \
-    -J-Dapp=<app-version> \
-    -J-Duris=<backend-uri-1>[,<backend-uri-n>]
+coursier launch lt.dvim.citywasp::citywasp-cli:latest.release --
 ```
 
 ### sbt
@@ -27,10 +25,8 @@ coursier launch lt.dvim.citywasp::citywasp-cli:latest.version -- \
 Checkout this repository to your computer and then run:
 
 ```bash
-sbtn stage
-cli/target/universal/stage/bin/citywasp-cli \
-    -Dapp=<app-version> \
-    -Duris=<backend-uri-1>[,<backend-uri-n>]
+sbt stage
+cli/target/universal/stage/bin/citywasp-cli
 ```
 
 ## Usages
