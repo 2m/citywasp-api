@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package lt.dvim.citywasp.api
+package lt.dvim.citywasp.cli
 
-import cats.implicits._
-import ciris.ConfigDecoder
-import ciris.ConfigError
+import cats.data.Validated
+import com.monovore.decline.Argument
 import sttp.model.Uri
 
-trait ConfigDecoders {
-  implicit val sttpUriDecoder: ConfigDecoder[String, Uri] =
-    ConfigDecoder[String].mapEither { (_, value) =>
-      Uri.parse(value).left.map(s => ConfigError(s))
-    }
+trait DeclineSupport {
+  implicit val configArgument: Argument[Uri] = new Argument[Uri] {
 
-  implicit def listDecoder[T](implicit decoder: ConfigDecoder[String, T]): ConfigDecoder[String, List[T]] =
-    ConfigDecoder[String].mapEither { (key, value) =>
-      value.split(',').map(decoder.decode(key, _)).toList.sequence
-    }
+    def read(value: String) =
+      Uri.parse(value) match {
+        case Left(error) => Validated.invalidNel(error)
+        case Right(uri)  => Validated.valid(uri)
+      }
+
+    def defaultMetavar = "uri"
+  }
 }

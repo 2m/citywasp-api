@@ -14,27 +14,26 @@
  * limitations under the License.
  */
 
-package lt.dvim.citywasp.api
+package lt.dvim.citywasp.cli
 
+import cats.data.NonEmptyList
 import cats.effect.ExitCode
 import cats.effect.IO
 import cats.effect.IOApp
 import cats.implicits._
-import ciris._
-import ciris.refined._
+import com.monovore.decline.refined._
 import sttp.client3.http4s.Http4sBackend
 import sttp.model.Uri
 import sttp.tapir.client.sttp.SttpClientInterpreter
 
+import lt.dvim.citywasp.api.Api
 import lt.dvim.citywasp.api.Model._
 
-object Main extends IOApp with ConfigDecoders with CatsEffectSupport {
-  final case class Config(
-      uris: List[Uri],
-      appVersion: AppVersion
-  )
+sealed trait CommandAction {
+  def run(): IO[ExitCode]
+}
 
-  val config = (prop("uris").as[List[Uri]], prop("app").as[AppVersion]).parMapN(Config)
+final case class Cars(appVersion: AppVersion, uris: NonEmptyList[Uri]) extends CommandAction with CatsEffectSupport {
 
   val backend = Http4sBackend.usingDefaultBlazeClientBuilder[IO]()
 
@@ -58,13 +57,11 @@ object Main extends IOApp with ConfigDecoders with CatsEffectSupport {
 
       allServices.combine(carCounts)
     }
-
   }
 
-  def run(args: List[String]): IO[ExitCode] =
+  def run(): IO[ExitCode] =
     for {
-      config <- config.load[IO]
-      result <- config.uris.map(cars(config.appVersion)).combineAll
+      result <- uris.map(cars(appVersion)).combineAll
       _ = print(
         result.toList
           .sortBy(_._2)
@@ -72,4 +69,76 @@ object Main extends IOApp with ConfigDecoders with CatsEffectSupport {
           .mkString("\n")
       )
     } yield ExitCode.Success
+}
+
+final case class Services(appVersion: AppVersion, uris: NonEmptyList[Uri])
+    extends CommandAction
+    with CatsEffectSupport {
+
+  val backend = Http4sBackend.usingDefaultBlazeClientBuilder[IO]()
+
+  private def services(appVersion: AppVersion)(uri: Uri) = {
+    val params = Params.default.copy(appVersion = appVersion, country = Country.fromUri(uri))
+    val servicesRequest = SttpClientInterpreter().toRequest(Api.AvailableServices.Get, Some(uri)).apply(params)
+    for {
+      services <- backend.use(servicesRequest.send(_)).flatMap(_.body.load)
+    } yield services
+  }
+
+  def run(): IO[ExitCode] =
+    for {
+      result <- uris.map(services(appVersion)).combineAll
+      _ = print(
+        result.toList
+          .sortBy(_.serviceName)
+          .map(s => s"'${s.serviceName}': ${s.serviceId}")
+          .mkString("\n")
+      )
+    } yield ExitCode.Success
+}
+
+import com.monovore.decline._
+
+object Commands extends DeclineSupport {
+  val opts = (
+    Opts
+      .option[AppVersion]("app-version", short = "a", help = "App version"),
+    Opts.options[Uri]("uri", help = "Backend URI. Can be specified multiple times.")
+  )
+
+  val commands = {
+
+    val cars =
+      Command(
+        name = "cars",
+        header = "Prints out a list of all of the cars currently known."
+      )(opts.mapN(Cars))
+
+    val services =
+      Command(
+        name = "services",
+        header = "Prints out a list of all of the services currently offered."
+      )(opts.mapN(Services))
+
+    Opts
+      .subcommand(cars)
+      .orElse(Opts.subcommand(services))
+  }
+}
+
+object Citywasp extends IOApp {
+  def run(args: List[String]): IO[ExitCode] = {
+    val command: Command[CommandAction] = Command(
+      name = "citywasp-cli",
+      header = "The CLI for the car sharing application",
+      helpFlag = true
+    )(Commands.commands)
+
+    command.parse(args) match {
+      case Right(cmd) =>
+        cmd.run()
+      case Left(e) =>
+        IO(println(e.toString())) *> IO(ExitCode.Error)
+    }
+  }
 }
