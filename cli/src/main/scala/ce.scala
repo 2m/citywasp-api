@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package lt.dvim.citywasp.api
+package lt.dvim.citywasp.cli
 
 import cats.effect.IO
 import sttp.tapir.DecodeResult
