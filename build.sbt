@@ -1,4 +1,4 @@
-val Tapir = "1.5.5"
+val Tapir = "1.6.0"
 
 lazy val citywasp = project
   .in(file("."))
@@ -27,7 +27,7 @@ lazy val cli = (project in file("cli"))
       "com.monovore"                  %% "decline"             % "2.4.1",
       "com.monovore"                  %% "decline-refined"     % "2.4.1",
       "org.typelevel"                 %% "cats-effect"         % "3.5.0",
-      "com.softwaremill.sttp.client3" %% "http4s-backend"      % "3.8.15",
+      "com.softwaremill.sttp.client3" %% "http4s-backend"      % "3.8.16",
       "org.http4s"                    %% "http4s-blaze-client" % "0.23.15"
     )
   )
