@@ -26,7 +26,7 @@ lazy val cli = (project in file("cli"))
     libraryDependencies ++= Seq(
       "com.monovore"                  %% "decline"             % "2.4.1",
       "com.monovore"                  %% "decline-refined"     % "2.4.1",
-      "org.typelevel"                 %% "cats-effect"         % "3.5.2",
+      "org.typelevel"                 %% "cats-effect"         % "3.5.3",
       "com.softwaremill.sttp.client3" %% "http4s-backend"      % "3.9.1",
       "org.http4s"                    %% "http4s-blaze-client" % "0.23.16"
     )
