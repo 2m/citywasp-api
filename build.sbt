@@ -15,7 +15,7 @@ lazy val api = (project in file("api"))
       "com.softwaremill.sttp.tapir" %% "tapir-refined"        % Tapir,
       "io.circe"                    %% "circe-generic"        % "0.14.7",
       "io.circe"                    %% "circe-generic-extras" % "0.14.3",
-      "org.scalameta"               %% "munit"                % "0.7.29" % Test
+      "org.scalameta"               %% "munit"                % "1.0.0" % Test
     )
   )
   .enablePlugins(AutomateHeaderPlugin)
