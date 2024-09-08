@@ -13,7 +13,7 @@ lazy val api = (project in file("api"))
       "com.softwaremill.sttp.tapir" %% "tapir-json-circe"     % Tapir,
       "com.softwaremill.sttp.tapir" %% "tapir-sttp-client"    % Tapir,
       "com.softwaremill.sttp.tapir" %% "tapir-refined"        % Tapir,
-      "io.circe"                    %% "circe-generic"        % "0.14.9",
+      "io.circe"                    %% "circe-generic"        % "0.14.10",
       "io.circe"                    %% "circe-generic-extras" % "0.14.4",
       "org.scalameta"               %% "munit"                % "1.0.1" % Test
     )
