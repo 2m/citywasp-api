@@ -1,4 +1,4 @@
-val Tapir = "1.11.2"
+val Tapir = "1.11.3"
 
 lazy val citywasp = project
   .in(file("."))
