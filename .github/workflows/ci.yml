@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
     steps:
     - uses: actions/checkout@v4
-    - uses: coursier/cache-action@v6
+    - uses: coursier/cache-action@v7
     - uses: laughedelic/coursier-setup@v1
       with:
         jvm: adopt:14
@@ -34,7 +34,7 @@ jobs:
       fail-fast: false
     steps:
     - uses: actions/checkout@v4
-    - uses: coursier/cache-action@v6
+    - uses: coursier/cache-action@v7
     - uses: laughedelic/coursier-setup@v1
       with:
         jvm: adopt:14
